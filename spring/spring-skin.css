@@ -1,0 +1,163 @@
+/* == SECTION: Global Styles =====================================*/
+
+html {
+    background: #b0c4de;
+    font-family: Verdana, sans-serif;
+    font-size: 10pt;
+}
+
+html * {
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 0.2em;
+    margin: 0em;
+    text-align: left;
+    vertical-align: top;
+}
+
+/* == SECTION: Page Layout ========================================*/
+
+html, body {
+    padding: 0em;
+    margin: 0em;
+}
+
+.page-heading {
+/* This is a harmless hack for IE to work - this definition is overriden by the next. */
+    position: absolute;
+    float: left;
+}
+.page-heading {
+    position: fixed;
+    top: 0em;
+    left: 0em;
+    bottom: 0em;
+    width: 13em;
+    padding: 1em;
+
+    color: white;
+    background-color: darkorange;
+    text-align: left;
+    overflow: auto;
+}
+.content {
+    margin-left: 15em;
+}
+
+
+/* == SECTION: Page Heading =====================================*/
+.page-heading h1 {
+    font-family: Georgia, Garamond, serif;
+    font-size: 22pt;
+    margin: 0em;
+}
+
+.page-heading h2 {
+    font-family: Georgia, Garamond, serif;
+    font-size: 14pt;
+    padding-top: 0.1em;
+    margin: 1em 0em 0.2em 0em;
+    border-top: 1px dotted white;
+}
+
+.page-heading a {
+    text-decoration: none;
+}
+.page-heading a:hover {
+    background-color: orange;
+}
+
+.page-heading ul {
+    margin: 0em;
+    padding: 0em;
+    list-style: none;
+}
+
+
+/* == SECTION: Bean Description =====================================*/
+.bean {
+    background-color: white;
+    border: 1px solid black;
+    margin: 1em;
+    padding: 0em;
+}
+
+.bean th {
+    background-color: #fff0b0;
+}
+
+.bean th,
+.bean td {
+    border: 1px solid black;
+}
+
+.bean h2 {
+    margin: 0em;
+    padding: 0.1em 0.3em 0.3em 0.3em;
+    background-color: #ffd700;
+}
+
+.bean table dl,
+.bean table ul,
+.bean table ol {
+    margin: 0em;
+    padding: 0.5em;
+    border: 1px solid black;
+    background-color: white;
+}
+
+.bean table ol { list-style: inside decimal; }
+.bean table ul { list-style: inside square; }
+.bean table dt { font-weight: bold; }
+
+.bean table {
+    width: 100%;
+}
+
+.injected-heading {
+    font-style: italic;
+}
+
+.bean .description {
+    font-size: 8pt;
+    margin: 1em;
+    border: none;
+}
+.bean-features {
+    margin: 0em;
+    padding: 0.2em;
+    font-size: 7pt;
+    background-color: #fff0b0;
+    color: black;
+    border-bottom: 1px solid black;
+}
+
+.bean table .boxed {
+    margin: -0.2em;
+    border: 2px solid #ffd780;
+    background-color: #ffd780;
+}
+
+.bean .bean {
+    margin: 0em;
+    border: 2px solid #ffd780;
+    background-color: #ffd780;
+}
+
+.bean .bean table * {
+    background-color: white;
+}
+.bean td h3{
+    margin: 0em;
+    padding: 0.1em 0.3em 0.3em 0.3em;
+}
+
+.bean .map td { background: white; }
+
+.bean .bean .bean-features,
+.bean .bean .bean-features *,
+.bean .boxed th {
+    background-color: #ffffd0;
+}

@@ -1,0 +1,59 @@
+Structure
+
+1. Project
+1.1.DONE. Page heading displaying the project name
+1.2.DONE. Sidebar - all tasks
+1.3. Sidebar - all properties
+1.4. Sidebar - pathlike summary
+1.5. Sidebar - critiques summary
+
+1.5. Content pane - global scope details
+1.5.1. Pathlike list: [path, classpath, fileset, zipfileset, dirset, filelist] => ID map.
+1.5.2. Safe: <property>, <typedef> and <taskdef>
+1.5.3. Modern: treat global scope as nameless target (ignoring the nested targets)
+
+1.6. Content panes - target details for each target
+1.6.1.DONE. Heading: target name & link to top
+1.6.2. Prerequisites: prerequisite tasks and preconditions (if, unless attributes)
+1.6.3.DONE. Description
+1.6.X. Property list: {@prefix}.[resource | file | url | environment | {{@name} = [{@value} | URL(@location)]}] {@description}
+	- "." is appended to the prefix if not specified.
+1.6.X. Pathlike list: [path, classpath, fileset, zipfileset, dirset, filelist] => ID map.
+1.6.4. Task list (
+	- show frequently used attributes when present as (TODO: id, src, dest, file, idref, pathref, classpathref etc.)
+	- do not account for container tasks like <paralel>
+1.6.5.DONE. Dependent tasks
+
+1.7. Content pane - property xreference table
+1.7.1. row: propname, defined-list, accessed-list
+1.7.2. alternate stylesheet to hide the description column
+
+1.8. Content pane - critiques
+
+TODO:
+. Add filter tokens reference
+
+. Properties details
+.1. table: name, value, description; Each row has a title="@description"
+
+. Add tasks in target.
+. Add all the other basic types (filesets, dirsets, filters, etc.)
+. Add index of all known properties, custom taskdefs, etc.
+
+. Full dependency resolution
+.1. Each target is executed only once, after it's prerequisites (depth-first), left to right
+.2. If the depends attribute and the if/unless attribute are set, the depends attribute is executed first.
+.3. Full dependency resolution: accout for the IF and UNLESS target attributes (problem with conditionals)
+
+
+. Add critiques.
+.1. project element
+.1.1. [project/@name=null] Add name for your project.
+.1.2. [project/@basedir="."] - the basedir is set to current dir by default
+.1.3. Optionally, a description for the project can be provided as a top-level <description> element (see the description type).
+.2. target element
+.2.1. It is a good practice to place your tstamp tasks in a so-called initialization target, on which all other targets depend. Make sure that target is always the first one in the depends list of the other targets. In this manual, most initialization targets have the name "init".
+
+. Stylesheet
+. Add/Hide:
+.1. Without description: Properties, Targets, Tasks

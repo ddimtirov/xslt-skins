@@ -1,0 +1,597 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="1.0" xml:lang="en"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <xsl:output doctype-public="-//W3C//DTD XHTML 1.1//EN"
+                doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"
+                omit-xml-declaration="no"
+                xml:lang="en"
+                method="xml"
+                version="XHTML 1.1"
+                indent="yes"
+                media-type="application/xhtml+xml"
+                encoding="UTF-8"
+            />
+
+    <xsl:template match="/beans">
+        <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" >
+            <head>
+                <title>Spring Descriptor</title>
+                <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+                <script type="text/javascript" defer="true" src="spring-skin.js">
+                    <xsl:text disable-output-escaping="yes"><![CDATA[
+function setTitle() {
+    documentPath = String(window.location);
+    documentResource = documentPath.split("/").pop();
+    documentFile = documentResource.split("#")[0];
+    documentFragment = documentResource.split("#")[1];
+
+    document.title = documentFile;
+
+    documentHeadingElement = document.getElementById("document-heading");
+    documentHeadingElement.firstChild.nodeValue = documentFile;
+}
+                    ]]></xsl:text>
+                </script>
+                <style type="text/css">
+                    <xsl:text disable-output-escaping="yes"><![CDATA[
+/* == SECTION: Global Styles =====================================*/
+
+html {
+    background: #b0c4de;
+    font-family: Verdana, sans-serif;
+    font-size: 10pt;
+}
+
+html * {
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 0.2em;
+    margin: 0em;
+    text-align: left;
+    vertical-align: top;
+}
+
+/* == SECTION: Page Layout ========================================*/
+
+html, body {
+    padding: 0em;
+    margin: 0em;
+}
+
+.page-heading {
+/* This is a harmless hack for IE to work - this definition is overriden by the next. */
+    position: absolute;
+    float: left;
+}
+.page-heading {
+    position: fixed;
+    top: 0em;
+    left: 0em;
+    bottom: 0em;
+    width: 13em;
+    padding: 1em;
+
+    color: white;
+    background-color: darkorange;
+    text-align: left;
+    overflow: auto;
+}
+.content {
+    margin-left: 15em;
+}
+
+
+/* == SECTION: Page Heading =====================================*/
+.page-heading h1 {
+    font-family: Georgia, Garamond, serif;
+    font-size: 22pt;
+    margin: 0em;
+}
+
+.page-heading h2 {
+    font-family: Georgia, Garamond, serif;
+    font-size: 14pt;
+    padding-top: 0.1em;
+    margin: 1em 0em 0.2em 0em;
+    border-top: 1px dotted white;
+}
+
+.page-heading a {
+    text-decoration: none;
+}
+.page-heading a:hover {
+    background-color: orange;
+}
+
+.page-heading ul {
+    margin: 0em;
+    padding: 0em;
+    list-style: none;
+}
+
+
+/* == SECTION: Bean Description =====================================*/
+.bean {
+    background-color: white;
+    border: 1px solid black;
+    margin: 1em;
+    padding: 0em;
+}
+
+.bean th {
+    background-color: #fff0b0;
+}
+
+.bean th,
+.bean td {
+    border: 1px solid black;
+}
+
+.bean h2 {
+    margin: 0em;
+    padding: 0.1em 0.3em 0.3em 0.3em;
+    background-color: #ffd700;
+}
+
+.bean table dl,
+.bean table ul,
+.bean table ol {
+    margin: 0em;
+    padding: 0.5em;
+    border: 1px solid black;
+    background-color: white;
+}
+
+.bean table ol { list-style: inside decimal; }
+.bean table ul { list-style: inside square; }
+.bean table dt { font-weight: bold; }
+
+.bean table {
+    width: 100%;
+}
+
+.injected-heading {
+    font-style: italic;
+}
+
+.bean .description {
+    font-size: 8pt;
+    margin: 1em;
+    border: none;
+}
+.bean-features {
+    margin: 0em;
+    padding: 0.2em;
+    font-size: 7pt;
+    background-color: #fff0b0;
+    color: black;
+    border-bottom: 1px solid black;
+}
+
+.bean table .boxed {
+    margin: -0.2em;
+    border: 2px solid #ffd780;
+    background-color: #ffd780;
+}
+
+.bean .bean {
+    margin: 0em;
+    border: 2px solid #ffd780;
+    background-color: #ffd780;
+}
+
+.bean .bean table * {
+    background-color: white;
+}
+.bean td h3{
+    margin: 0em;
+    padding: 0.1em 0.3em 0.3em 0.3em;
+}
+
+.bean .map td { background: white; }
+
+.bean .bean .bean-features,
+.bean .bean .bean-features *,
+.bean .boxed th {
+    background-color: #ffffd0;
+}
+
+                    ]]></xsl:text>
+                </style>
+            </head>
+            <body onload="setTitle()">
+                <div class="page-heading">
+                    <xsl:call-template name="page-heading-sidebar"/>
+                </div>
+
+                <div class="content">
+                    <xsl:apply-templates select="bean" mode="describe"/>
+                </div>
+            </body>
+        </html>
+    </xsl:template>
+
+    <xsl:template name="page-heading-sidebar">
+        <h1 id="document-heading">Spring Descriptor</h1>
+        <xsl:apply-templates  select="description"/>
+        <xsl:apply-templates  select="." mode="sidebar"/>
+        <xsl:if test="import">
+            <div class="imports">
+                <h2>Imports</h2>
+                <ul>
+                    <xsl:for-each select="import">
+                        <li><a href="{@resource}"><xsl:value-of select="@resource"/></a></li>
+                    </xsl:for-each>
+                </ul>
+            </div>
+        </xsl:if>
+
+        <xsl:if test="alias">
+            <div class="aliases">
+                <h2 title="Bean Aliases (linked by id)">Aliases</h2>
+                <ul>
+                    <xsl:for-each select="alias">
+                        <li>
+                            <a class="name" href="#bean-{@name}">
+                                <xsl:value-of select="@name"/>
+                            </a>
+                            as
+                            <strong>
+                                <a id="bean-{@alias}" class="name">
+                                    <xsl:value-of select="@alias"/>
+                                </a>
+                            </strong>
+                        </li>
+                    </xsl:for-each>
+                </ul>
+            </div>
+        </xsl:if>
+
+        <xsl:if test="bean">
+            <div class="beans">
+                <h2 title="Top Level Beans (linked by id)">Beans</h2>
+                <ul>
+                    <xsl:for-each select="bean">
+                        <li>
+                            <xsl:choose>
+                                <xsl:when test="@id and @name">
+                                    <a class="name" href="#bean-{@id}" title="@name">
+                                        <xsl:value-of select="@id"/>*
+                                    </a>
+                                </xsl:when>
+                                <xsl:when test="@id and not(@name)">
+                                    <a class="name" href="#bean-{@id}" >
+                                        <xsl:value-of select="@id"/>
+                                    </a>
+                                </xsl:when>
+                                <xsl:when test="not(@id) and @name">
+                                    <xsl:value-of select="@name"/>*
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    Anonymous
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </li>
+                    </xsl:for-each>
+                </ul>
+            </div>
+        </xsl:if>
+    </xsl:template>
+
+    <xsl:template match="description">
+        <p class="description">
+            <xsl:value-of select="."/>
+        </p>
+    </xsl:template>
+
+    <xsl:template match="beans" mode="sidebar">
+        <div class="defaults">
+            <h2>Defaults</h2>
+            <table>
+                <tr><th>autowire</th>
+                    <td><xsl:choose>
+                        <xsl:when test="@default-autowire">
+                            <xsl:value-of select="@default-autowire"/>
+                        </xsl:when>
+                        <xsl:otherwise>no</xsl:otherwise>
+                    </xsl:choose></td>
+                </tr>
+                <tr><th><abbr title="dependency-check">dep-check</abbr></th>
+                    <td><xsl:choose>
+                        <xsl:when test="@default-dependency-check">
+                            <xsl:value-of select="@default-dependency-check"/>
+                        </xsl:when>
+                        <xsl:otherwise>none</xsl:otherwise>
+                    </xsl:choose></td>
+                </tr>
+                <tr><th>lazy-init</th>
+                    <td><xsl:choose>
+                        <xsl:when test="@default-lazy-init">
+                            <xsl:value-of select="@default-lazy-init"/>
+                        </xsl:when>
+                        <xsl:otherwise>false</xsl:otherwise>
+                    </xsl:choose></td>
+                </tr>
+            </table>
+        </div>
+    </xsl:template>
+
+    <xsl:template match="bean" mode="describe">
+        <xsl:param name="heading-level" select="2"/>
+        <div class="bean" id="bean-{@id}">
+            <div class="bean-heading">
+                <xsl:element name="h{$heading-level}">
+                    <xsl:attribute name="title"><xsl:value-of select="@class"/></xsl:attribute>
+                    <xsl:choose>
+                        <xsl:when test="not(@name or @id)">
+                            Anonymous Bean
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="@id"/>
+                            <xsl:if test="@name"> *<xsl:value-of select="@name"/></xsl:if>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:element>
+                <xsl:apply-templates  select="description"/>
+            </div>
+            <table>
+                <xsl:if test="constructor-arg or property">
+                    <xsl:if test="constructor-arg">
+                        <xsl:call-template name="injected-thead">
+                            <xsl:with-param name="section-name" select="'Constructor Injected Dependencies'"/>
+                            <xsl:with-param name="first-column" select="'Index'"/>
+                        </xsl:call-template>
+                        <tbody>
+                            <xsl:apply-templates select="constructor-arg" mode="injected-table-row"/>
+                        </tbody>
+                    </xsl:if>
+                    <xsl:if test="property">
+                        <xsl:call-template name="injected-thead">
+                            <xsl:with-param name="section-name" select="'Setter Injected Dependencies'"/>
+                            <xsl:with-param name="first-column" select="'Name'"/>
+                        </xsl:call-template>
+                        <tbody>
+                            <xsl:apply-templates select="property" mode="injected-table-row"/>
+                        </tbody>
+                    </xsl:if>
+                </xsl:if>
+                <tfoot>
+                    <tr>
+                        <td colspan="4" class="bean-features">
+                            <xsl:apply-templates select="." mode="bean-features"/>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </xsl:template>
+    <xsl:template match="bean" mode="bean-features">
+        <strong>features: </strong>
+        <xsl:choose>
+            <xsl:when test="@lazy-init='true'">lazy </xsl:when>
+            <xsl:when test="@lazy-init='false'">eager </xsl:when>
+        </xsl:choose>
+        <xsl:if test="@abstract='true'">abstract </xsl:if>
+        <xsl:choose>
+            <xsl:when test="@singleton='false'">prototype; </xsl:when>
+            <xsl:otherwise>singleton; </xsl:otherwise>
+        </xsl:choose>
+        <xsl:choose>
+            <xsl:when test="@autowire='no'">explicit wiring; </xsl:when>
+            <xsl:when test="@autowire='byName'">wiring by name; </xsl:when>
+            <xsl:when test="@autowire='byType'">wiring by type </xsl:when>
+            <xsl:when test="@autowire='constructor'">wiring by constructor-arg type; </xsl:when>
+            <xsl:when test="@autowire='autodetect'">autowiring; </xsl:when>
+        </xsl:choose>
+        <xsl:choose>
+            <xsl:when test="@dependency-check='none'"></xsl:when>
+            <xsl:when test="@dependency-check='simple'">all primitive properties must be set; </xsl:when>
+            <xsl:when test="@dependency-check='objects'">all object properties must be set; </xsl:when>
+            <xsl:when test="@dependency-check='all'">all properties must be set; </xsl:when>
+        </xsl:choose>
+        <strong>class: </strong>
+        <xsl:value-of select="@class"/>;
+        <xsl:if test="@parent">
+            <strong>parent: </strong><xsl:value-of select="@parent"/>;
+        </xsl:if>
+        <xsl:if test="@factory-bean">
+            <strong>factory-bean: </strong><xsl:value-of select="@factory-bean"/>;
+        </xsl:if>
+        <xsl:if test="@factory-method">
+            <strong>factory-method: </strong><xsl:value-of select="@factory-method"/>;
+        </xsl:if>
+        <xsl:if test="@init-method">
+            <strong>init method: </strong><xsl:value-of select="@init-method"/>;
+        </xsl:if>
+        <xsl:if test="@destroy-method">
+            <strong>destroy method: </strong><xsl:value-of select="@destroy-method"/>;
+        </xsl:if>
+        <xsl:if test="@depends-on">
+            <strong>depends on: </strong><xsl:value-of select="@depends-on"/>;
+        </xsl:if>
+    </xsl:template>
+
+    <xsl:template name="injected-thead">
+        <xsl:param name="section-name" select="'undefined'"/>
+        <xsl:param name="first-column" select="'undefined'"/>
+        <thead>
+            <tr><th colspan="4" class="injected-heading">
+                <xsl:value-of select="$section-name"/>
+            </th></tr>
+            <tr>
+                <th class="name"><xsl:value-of select="$first-column"/></th>
+                <th class="type">Type</th>
+                <th class="value">Value</th>
+                <th class="description">Description</th>
+            </tr>
+        </thead>
+    </xsl:template>
+
+    <xsl:template match="property|constructor-arg" mode="injected-table-row">
+        <tr>
+            <td class="name">
+                <xsl:value-of select="@name"/>
+                <xsl:value-of select="@index"/>
+                <xsl:if test="@type and value/@type">
+                    <span class="warning">
+                        Both name and index specified!
+                    </span>
+                </xsl:if>
+            </td>
+            <td class="type">
+                <xsl:value-of select="value/@type"/>
+                <xsl:value-of select="@type"/>
+                <xsl:if test="@type and value/@type">
+                    <span class="warning">
+                        type specified both in attribute and element! Using:
+                        <xsl:value-of select="@type"/>
+                    </span>
+                </xsl:if>
+            </td>
+            <td class="value">
+                <xsl:if test="not(description)">
+                    <xsl:attribute name="colspan">2</xsl:attribute>
+                </xsl:if>
+                <xsl:apply-templates mode="injected-value"/>
+                <xsl:value-of select="@value"/>
+                <xsl:if test="@ref">
+                    <a href="#bean-{@ref}" title="ref({@ref})"><xsl:value-of select="@ref"/></a>
+                </xsl:if>
+                <xsl:if test="@value and (value or null or ref or idref or bean or list or set or map or props)">
+                    <span class="warning">
+                        Value specified both in attribute and element! Using:
+                        <xsl:value-of select="@value"/>
+                    </span>
+                </xsl:if>
+            </td>
+            <xsl:if test="description">
+                <td class="description"><xsl:value-of select="description"/></td>
+            </xsl:if>
+        </tr>
+    </xsl:template>
+
+    <xsl:template match="null" mode="injected-value">
+        <xsl:param name="container-tag" select="'div'"/>
+        <xsl:element name="{$container-tag}">
+            <xsl:attribute name="class">value</xsl:attribute>
+            <code>null</code>
+        </xsl:element>
+    </xsl:template>
+
+    <xsl:template match="value" mode="injected-value">
+        <xsl:param name="container-tag" select="'div'"/>
+        <xsl:element name="{$container-tag}">
+            <xsl:attribute name="class">value</xsl:attribute>
+            <xsl:value-of select="."/>
+        </xsl:element>
+    </xsl:template>
+
+    <xsl:template match="ref" mode="injected-value">
+        <xsl:param name="container-tag" select="'div'"/>
+        <xsl:element name="{$container-tag}">
+            <xsl:attribute name="class">ref</xsl:attribute>
+            <xsl:call-template name="generate-ref">
+                <xsl:with-param name="ref-name" select="'ref'"/>
+            </xsl:call-template>
+        </xsl:element>
+    </xsl:template>
+
+    <xsl:template match="idref" mode="injected-value">
+        <xsl:param name="container-tag" select="'div'"/>
+        <xsl:element name="{$container-tag}">
+            <xsl:attribute name="class">idref</xsl:attribute>
+            <xsl:call-template name="generate-ref">
+                <xsl:with-param name="ref-name" select="'idref'"/>
+            </xsl:call-template>
+        </xsl:element>
+    </xsl:template>
+
+    <xsl:template name="generate-ref">
+        <xsl:param name="ref-name"/>
+        <xsl:choose>
+            <xsl:when test="@bean">bean-</xsl:when>
+            <xsl:when test="@parent">parent-</xsl:when>
+        </xsl:choose><xsl:value-of select="$ref-name"/>(<xsl:choose>
+            <xsl:when test="@bean"><a href="#bean-{@bean}" title="bean-{$ref-name}({@bean})"><xsl:value-of select="@bean"/></a></xsl:when>
+            <xsl:when test="@local"><a href="#bean-{@local}" title="{$ref-name}({@local})"><xsl:value-of select="@local"/></a></xsl:when>
+            <xsl:when test="@parent"><xsl:value-of select="@parent"/></xsl:when>
+        </xsl:choose>)
+    </xsl:template>
+
+    <xsl:template match="bean" mode="injected-value">
+        <xsl:param name="container-tag" select="'div'"/>
+        <xsl:element name="{$container-tag}">
+            <xsl:attribute name="class">boxed bean</xsl:attribute>
+            <xsl:apply-templates select="." mode="describe">
+                <xsl:with-param name="heading-level" select="3"/>
+            </xsl:apply-templates>
+        </xsl:element>
+    </xsl:template>
+
+    <xsl:template match="list" mode="injected-value">
+        <xsl:param name="container-tag" select="'div'"/>
+        <xsl:element name="{$container-tag}">
+            <xsl:attribute name="class">boxed list</xsl:attribute>
+            <h3>List</h3>
+            <ol>
+                <xsl:apply-templates mode="injected-value">
+                    <xsl:with-param name="container-tag" select="'li'"/>
+                </xsl:apply-templates>
+            </ol>
+        </xsl:element>
+    </xsl:template>
+
+    <xsl:template match="set" mode="injected-value">
+        <xsl:param name="container-tag" select="'div'"/>
+        <xsl:element name="{$container-tag}">
+            <xsl:attribute name="class">boxed set</xsl:attribute>
+            <h3>Set</h3>
+            <ul>
+                <xsl:apply-templates mode="injected-value">
+                    <xsl:with-param name="container-tag" select="'li'"/>
+                </xsl:apply-templates>
+            </ul>
+        </xsl:element>
+    </xsl:template>
+
+    <xsl:template match="props" mode="injected-value">
+        <xsl:param name="container-tag" select="'div'"/>
+        <xsl:element name="{$container-tag}">
+            <xsl:attribute name="class">boxed props</xsl:attribute>
+            <h3>Properties</h3>
+            <dl><xsl:apply-templates mode="injected-value"/></dl>
+        </xsl:element>
+    </xsl:template>
+    <xsl:template match="prop" mode="injected-value">
+        <dt class="key"><xsl:value-of select="@key"/></dt>
+        <dd class="value"><xsl:value-of select="text()"/></dd>
+    </xsl:template>
+
+    <xsl:template match="map" mode="injected-value">
+        <xsl:param name="container-tag" select="'div'"/>
+        <xsl:element name="{$container-tag}">
+            <xsl:attribute name="class">boxed map</xsl:attribute>
+            <h3>Map</h3>
+            <table>
+                <thead>
+                    <tr><th class="key">Key</th><th class="value">Value</th></tr>
+                </thead>
+                <tbody>
+                    <xsl:apply-templates select="entry" mode="injected-value"/>
+                </tbody>
+            </table>
+        </xsl:element>
+    </xsl:template>
+    <xsl:template match="entry" mode="injected-value">
+        <tr class="entry">
+            <td class="key"><xsl:apply-templates select="key" mode="injected-value"/></td>
+            <td class="value"><xsl:apply-templates select="bean|ref|idref|list|set|map|props|value|null" mode="injected-value"/></td>
+        </tr>
+    </xsl:template>
+
+</xsl:stylesheet>
